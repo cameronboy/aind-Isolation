@@ -1,4 +1,4 @@
-"""Finish all TODO items in this file to complete the isolation project, then
+"""Finish all items in this file to complete the isolation project, then
 test your agent's strength against a set of known agents using tournament.py
 and include the results in your report.
 """
@@ -34,8 +34,15 @@ def custom_score(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    raise NotImplementedError
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    pl_moves = len(game.get_legal_moves(player))
+    op_moves = len(game.get_legal_mvoes(game.get_opponent(player)))
+    return float(pl_moves - opp_moves)
 
 
 def custom_score_2(game, player):
@@ -60,7 +67,7 @@ def custom_score_2(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
+    # TODO: custom_score_2!
     raise NotImplementedError
 
 
@@ -86,7 +93,7 @@ def custom_score_3(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
+    # TODO: custom_score_3!
     raise NotImplementedError
 
 
@@ -112,6 +119,7 @@ class IsolationPlayer:
         positive value large enough to allow the function to return before the
         timer expires.
     """
+
     def __init__(self, search_depth=3, score_fn=custom_score, timeout=10.):
         self.search_depth = search_depth
         self.score = score_fn
@@ -125,6 +133,7 @@ class MinimaxPlayer(IsolationPlayer):
     minimax to return a good move before the search time limit expires.
     """
 
+    # Don't modify this get_move function....
     def get_move(self, game, time_left):
         """Search for the best move from the available legal moves and return a
         result before the time limit expires.
@@ -170,7 +179,28 @@ class MinimaxPlayer(IsolationPlayer):
         # Return the best move from the last completed search iteration
         return best_move
 
-    def minimax(self, game, depth):
+    def get_legal_moves(self):
+        # TODO get legal moves
+        pass
+
+    def forecast_move(self, move):
+        # TODO forecast_move
+        pass
+
+    def terminal_test(game):
+        # TODO terminal_test
+        pass
+
+    def max_value(self, depth):
+        # TODO max_value
+        pass
+
+    def min_value(self, depth):
+        # TODO max_value
+        pass
+
+    def minimax(self, depth):
+        # TODO MINIMAX
         """Implement depth-limited minimax search algorithm as described in
         the lectures.
 
@@ -212,9 +242,6 @@ class MinimaxPlayer(IsolationPlayer):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        # TODO: finish this function!
-        raise NotImplementedError
-
 
 class AlphaBetaPlayer(IsolationPlayer):
     """Game-playing agent that chooses a move using iterative deepening minimax
@@ -230,7 +257,7 @@ class AlphaBetaPlayer(IsolationPlayer):
         iterative deepening search instead of fixed-depth search.
 
         **********************************************************************
-        NOTE: If time_left() < 0 when this function returns, the agent will
+              If time_left() < 0 when this function returns, the agent will
               forfeit the game due to timeout. You must return _before_ the
               timer reaches 0.
         **********************************************************************
@@ -254,7 +281,7 @@ class AlphaBetaPlayer(IsolationPlayer):
         """
         self.time_left = time_left
 
-        # TODO: finish this function!
+        # TODO: get_move!
         raise NotImplementedError
 
     def alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf")):
@@ -305,5 +332,5 @@ class AlphaBetaPlayer(IsolationPlayer):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        # TODO: finish this function!
+        # TODO: alphabeta!
         raise NotImplementedError
