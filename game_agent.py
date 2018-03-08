@@ -179,25 +179,41 @@ class MinimaxPlayer(IsolationPlayer):
         # Return the best move from the last completed search iteration
         return best_move
 
-    def get_legal_moves(self):
-        # TODO get legal moves
-        pass
-
-    def forecast_move(self, move):
-        # TODO forecast_move
-        pass
-
     def terminal_test(game):
-        # TODO terminal_test
-        pass
+        return not bool(game.get_legal_moves())
 
     def max_value(self, depth):
-        # TODO max_value
-        pass
+        if terminal_test():
+            return -1
+        # now we're adding a depth limit!
+        if depth <= 0:
+            return 0
+        # Since we're currently on a max level, we're starting our value out as
+        # negative infinity. Any score smaller than that ( a loss ) is preferred
+        v = float("-inf")
+        # Run through all the available nodes from this level
+        for move in game.get_legal_moves():
+            # Then forecast each move to get the score and replace
+            # our current score with any larger one that comes about.
+            v = max(v, min_value(game.forecast_move(move), depth - 1))
+        return v
 
     def min_value(self, depth):
-        # TODO max_value
-        pass
+        if terminal_test(gameState):
+            return 1
+
+        # now we're adding a depth limit!
+        if depth <= 0:
+            return 0
+        # Since we're currently on a min level, we're starting our value out as
+        # postive infinity. Any score smaller than that ( a loss ) is preferred
+        v = float("inf")
+        # Run through all the available nodes from this level
+        for move in gameState.get_legal_moves():
+            # Then forecast each move to get the score and replace
+            # our current score with any smaller one that comes about.
+            v = min(v, max_value(game.forecast_move(move), depth - 1))
+        return v
 
     def minimax(self, depth):
         # TODO MINIMAX
@@ -239,8 +255,25 @@ class MinimaxPlayer(IsolationPlayer):
                 each helper function or else your agent will timeout during
                 testing.
         """
+
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
+
+        best_score = float("-inf")
+        best_move = None
+        # Let's grab our potential moves and loop through them
+        for m in game.get_legal_moves():
+            # For each possible move, we want to generate it's children nodes'
+            # scores and take the minimum value (the mins turn is next)
+            v = min_value(gameState.forecast_move(m), depth - 1)
+            # If that move's forecasted score is better than our current score
+            # expection then we take that for our best score and best move before
+            # moving on to the next move or if we're done looping we return that
+            # best move
+            if v > best_score:
+                best_score = v
+                best_move = m
+        return best_move
 
 
 class AlphaBetaPlayer(IsolationPlayer):
