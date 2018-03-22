@@ -4,6 +4,8 @@ and include the results in your report.
 """
 import random
 from random import randint
+import numpy as np
+import random
 
 
 class SearchTimeout(Exception):
@@ -43,7 +45,7 @@ def custom_score(game, player):
 
     pl_moves = len(game.get_legal_moves(player))
     op_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    return float(pl_moves - op_moves)
+    return -float(pl_moves - op_moves)
 
 
 def custom_score_2(game, player):
@@ -74,9 +76,22 @@ def custom_score_2(game, player):
     if game.is_winner(player):
         return float("inf")
 
+    board_center = (2, 2)
 
-    op_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    return float(-op_moves)
+    avail_moves = game.get_legal_moves(player)
+    total_moves = len(avail_moves)
+
+    total_distance_from_ctr = 0
+
+    for move in avail_moves:
+        mx, my = move
+        cx, cy = board_center[0], board_center[1]
+
+        total_distance_from_ctr += np.sqrt((mx-cx)**2 + (my-cy)**2)
+    if total_moves > 0:
+        return float(total_distance_from_ctr / total_moves)
+    else:
+        return -1
 
 
 def custom_score_3(game, player):
@@ -107,9 +122,8 @@ def custom_score_3(game, player):
     if game.is_winner(player):
         return float("inf")
 
-    pl_moves = len(game.get_legal_moves(player))
-   
-    return float(pl_moves)
+    return random.random()
+
 
 class IsolationPlayer:
     """Base class for minimax and alphabeta agents -- this class is never
@@ -134,7 +148,7 @@ class IsolationPlayer:
         timer expires.
     """
 
-    def __init__(self, search_depth=6, score_fn=custom_score, timeout=1000.):
+    def __init__(self, search_depth=3, score_fn=custom_score, timeout=10.):
         self.search_depth = search_depth
         self.score = score_fn
         self.time_left = None
@@ -184,6 +198,7 @@ class MinimaxPlayer(IsolationPlayer):
 
         # Initialize the best move so that this function returns something
         # in case the search fails due to timeout
+
         best_move = (-1, -1)
 
         try:
@@ -199,7 +214,7 @@ class MinimaxPlayer(IsolationPlayer):
 
     def terminal_test(self, game, search_depth):
         self.time_check()
-        if len(game.get_legal_moves()) != 0 and search_depth > 0:
+        if game.get_legal_moves() and search_depth > 0:
             return False
         return True
 
@@ -275,9 +290,13 @@ class MinimaxPlayer(IsolationPlayer):
         self.time_check()
         best_score = float("-inf")
         best_move = (-1, -1)
+        legal_moves = game.get_legal_moves()
 
-        for m in game.get_legal_moves():
-            v = self.min_value(game.forecast_move(m), search_depth - 1)
+        if len(legal_moves) > 0:
+            best_move = legal_moves[0]
+
+        for m in legal_moves:
+            v = self.max_value(game.forecast_move(m), search_depth - 1)
             if v > best_score:
                 best_score = v
                 best_move = m
@@ -355,16 +374,20 @@ class AlphaBetaPlayer(IsolationPlayer):
 
         self.time_check()
 
+        legal_moves = game.get_legal_moves()
         best_move = (-1, -1)
+        if len(legal_moves) > 0:
+            best_move = legal_moves[0]
 
         if self.terminal_test(game, search_depth):
+            # print('terminal_case - ab_max: {}'.format(best_move))
             return (self.score(game, self), best_move)
 
         v = float("-inf")
         # Run through all the available nodes from this level
         for move in game.get_legal_moves():
             result = self.min_value(game.forecast_move(move),
-                                 search_depth - 1, alpha, beta)
+                                    search_depth - 1, alpha, beta)
             if result[0] > v:
                 v, _ = result
                 best_move = move
@@ -377,16 +400,20 @@ class AlphaBetaPlayer(IsolationPlayer):
 
         self.time_check()
 
+        legal_moves = game.get_legal_moves()
         best_move = (-1, -1)
+        if len(legal_moves) > 0:
+            best_move = legal_moves[0]
 
         if self.terminal_test(game, search_depth):
+            # print('terminal_case - ab_min: {}'.format(best_move))
             return (self.score(game, self), best_move)
 
         v = float("inf")
         # Run through all the available nodes from this level
         for move in game.get_legal_moves():
             result = self.max_value(game.forecast_move(move),
-                                 search_depth - 1, alpha, beta)
+                                    search_depth - 1, alpha, beta)
             if result[0] < v:
                 v, _ = result
                 best_move = move
