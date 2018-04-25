@@ -95,6 +95,7 @@ def custom_score_2(game, player):
 
 
 def custom_score_3(game, player):
+   (
     """Calculate the heuristic value of a game state from the point of view
     of the given player.
 
@@ -116,6 +117,7 @@ def custom_score_3(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
+   )
     if game.is_loser(player):
         return float("-inf")
 
@@ -162,7 +164,7 @@ class MinimaxPlayer(IsolationPlayer):
     """
 
     def time_check(self):
-        if self.time_left() < self.TIMER_THRESHOLD:
+        if self.time_left() <= self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
     # Don't modify this get_move function....
@@ -309,6 +311,10 @@ class AlphaBetaPlayer(IsolationPlayer):
     make sure it returns a good move before the search time limit expires.
     """
 
+    def time_check(self):
+        if self.time_left() <= self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
     def get_move(self, game, time_left):
         """Search for the best move from the available legal moves and return a
         result before the time limit expires.
@@ -360,9 +366,6 @@ class AlphaBetaPlayer(IsolationPlayer):
             return best_move
         return best_move
 
-    def time_check(self):
-        if self.time_left() < self.TIMER_THRESHOLD:
-            raise SearchTimeout()
 
     def terminal_test(self, game, search_depth):
         self.time_check()
