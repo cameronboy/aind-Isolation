@@ -13,7 +13,7 @@ class SearchTimeout(Exception):
     pass
 
 
-def custom_score(game, player):
+def custom_score_3(game, player):
     """Calculate the heuristic value of a game state from the point of view
     of the given player.
 
@@ -43,9 +43,59 @@ def custom_score(game, player):
     if game.is_winner(player):
         return float("inf")
 
+    c = int(game.width / 2) + 1
+    board_center = (c, c)
+
+    avail_moves = game.get_legal_moves(player)
+    total_moves = len(avail_moves)
+
+    total_distance_from_ctr = 0
+
+    for move in avail_moves:
+        mx, my = move
+        cx, cy = board_center[0], board_center[1]
+
+        total_distance_from_ctr += np.sqrt((mx-cx)**2 + (my-cy)**2)
+    
+    if total_moves > 0 and total_distance_from_ctr > 0:
+        return float(total_distance_from_ctr / total_moves)
+    else:
+        return float("-inf")
+
+
+
+def custom_score(game, player):
+    """Calculate the heuristic value of a game state from the point of view
+    of the given player.
+
+    Note: this function should be called from within a Player instance as
+    `self.score()` -- you should not need to call this function directly.
+
+    Parameters
+    ----------
+    game : `isolation.Board`
+        An instance of `isolation.Board` encoding the current state of the
+        game (e.g., player locations and blocked cells).
+
+    player : object
+        A player instance in the current game (i.e., an object corresponding to
+        one of the player objects `game.__player_1__` or `game.__player_2__`.)
+
+    Returns
+    -------
+    float
+        The heuristic value of the current game state to the specified player.
+    """
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
     pl_moves = len(game.get_legal_moves(player))
     op_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    return -float(pl_moves - op_moves)
+
+    return float(pl_moves - op_moves)
 
 
 def custom_score_2(game, player):
@@ -70,13 +120,18 @@ def custom_score_2(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
+   
     if game.is_loser(player):
         return float("-inf")
 
     if game.is_winner(player):
         return float("inf")
 
-    board_center = (2, 2)
+    c = int(game.width / 2) + 1
+    board_center = (c, c)
+
+    pl_moves = len(game.get_legal_moves(player))
+    op_moves = len(game.get_legal_moves(game.get_opponent(player)))
 
     avail_moves = game.get_legal_moves(player)
     total_moves = len(avail_moves)
@@ -88,43 +143,14 @@ def custom_score_2(game, player):
         cx, cy = board_center[0], board_center[1]
 
         total_distance_from_ctr += np.sqrt((mx-cx)**2 + (my-cy)**2)
-    if total_moves > 0:
-        return float(total_distance_from_ctr / total_moves)
+    
+    # I want to penalize board states that have a lot of moves around the perimeter
+    # So I'm multiplying the inverse of the mean distance to the center by the number
+    # of moves we have.
+    if total_moves > 0 and total_distance_from_ctr > 0:
+        return (1. / float(total_distance_from_ctr / total_moves)) * float(pl_moves - op_moves)
     else:
-        return -1
-
-
-def custom_score_3(game, player):
-   (
-    """Calculate the heuristic value of a game state from the point of view
-    of the given player.
-
-    Note: this function should be called from within a Player instance as
-    `self.score()` -- you should not need to call this function directly.
-
-    Parameters
-    ----------
-    game : `isolation.Board`
-        An instance of `isolation.Board` encoding the current state of the
-        game (e.g., player locations and blocked cells).
-
-    player : object
-        A player instance in the current game (i.e., an object corresponding to
-        one of the player objects `game.__player_1__` or `game.__player_2__`.)
-
-    Returns
-    -------
-    float
-        The heuristic value of the current game state to the specified player.
-    """
-   )
-    if game.is_loser(player):
         return float("-inf")
-
-    if game.is_winner(player):
-        return float("inf")
-
-    return random.random()
 
 
 class IsolationPlayer:
@@ -164,7 +190,8 @@ class MinimaxPlayer(IsolationPlayer):
     """
 
     def time_check(self):
-        if self.time_left() <= self.TIMER_THRESHOLD:
+        # Adding a buffer of .02 seconds to aide in removing the timeout exceptions
+        if self.time_left() <= self.TIMER_THRESHOLD - .02:
             raise SearchTimeout()
 
     # Don't modify this get_move function....
@@ -312,7 +339,8 @@ class AlphaBetaPlayer(IsolationPlayer):
     """
 
     def time_check(self):
-        if self.time_left() <= self.TIMER_THRESHOLD:
+        # Adding a buffer of .02 seconds to aide in removing the timeout exceptions
+        if self.time_left() <= self.TIMER_THRESHOLD - .02:
             raise SearchTimeout()
 
     def get_move(self, game, time_left):

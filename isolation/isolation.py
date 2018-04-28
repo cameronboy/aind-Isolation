@@ -37,7 +37,7 @@ class Board(object):
     BLANK = 0
     NOT_MOVED = None
 
-    def __init__(self, player_1, player_2, width=7, height=7):
+    def __init__(self, player_1, player_2, width=13, height=13):
         self.width = width
         self.height = height
         self.move_count = 0
