@@ -63,7 +63,6 @@ def custom_score_3(game, player):
         return float("-inf")
 
 
-
 def custom_score(game, player):
     """Calculate the heuristic value of a game state from the point of view
     of the given player.
