@@ -324,7 +324,7 @@ class MinimaxPlayer(IsolationPlayer):
             best_move = legal_moves[0]
 
         for m in legal_moves:
-            v = self.max_value(game.forecast_move(m), search_depth - 1)
+            v = self.min_value(game.forecast_move(m), search_depth - 1)
             if v > best_score:
                 best_score = v
                 best_move = m
