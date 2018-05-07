@@ -90,11 +90,15 @@ def custom_score(game, player):
 
     if game.is_winner(player):
         return float("inf")
+    
 
-    pl_moves = len(game.get_legal_moves(player))
-    op_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    pl_moves = game.get_legal_moves(player)
+    op_moves = game.get_legal_moves(game.get_opponent(player))
+    pl_future_moves = float(sum([len(game.__get_moves__(move)) for move in pl_moves ]))
+    op_future_moves = float(sum([len(game.__get_moves__(move)) for move in op_moves ]))
+    return pl_future_moves - op_future_moves + len(pl_moves) - len(op_moves)
 
-    return float(pl_moves - op_moves)
+    
 
 
 def custom_score_2(game, player):
@@ -129,8 +133,11 @@ def custom_score_2(game, player):
     c = int(game.width / 2) + 1
     board_center = (c, c)
 
-    pl_moves = len(game.get_legal_moves(player))
-    op_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    pl_options = game.get_legal_moves(player)
+    op_optins = game.get_legal_moves(game.get_opponent(player))
+
+    pl_moves = len(pl_options)
+    op_moves = len(op_optins)
 
     avail_moves = game.get_legal_moves(player)
     total_moves = len(avail_moves)
@@ -145,9 +152,13 @@ def custom_score_2(game, player):
     
     # I want to penalize board states that have a lot of moves around the perimeter
     # So I'm multiplying the inverse of the mean distance to the center by the number
-    # of moves we have.
+    # of moves we have PLUS the number of future moves from the board states that
+    # terminate from the current board
+    pl_future_moves = float(sum([len(game.__get_moves__(move)) for move in pl_options ]))
+    op_future_moves = float(sum([len(game.__get_moves__(move)) for move in op_optins ]))
+
     if total_moves > 0 and total_distance_from_ctr > 0:
-        return (1. / float(total_distance_from_ctr / total_moves)) * float(pl_moves - op_moves)
+        return (1. / float(total_distance_from_ctr / total_moves)) * float(pl_future_moves - op_future_moves + pl_moves - op_moves)
     else:
         return float("-inf")
 
