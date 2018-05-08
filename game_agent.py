@@ -98,7 +98,7 @@ def custom_score(game, player):
     pl_future_moves = float(sum([len(game.__get_moves__(move)) for move in pl_moves ]))
     op_future_moves = float(sum([len(game.__get_moves__(move)) for move in op_moves ]))
     
-    return pl_future_moves - op_future_moves + len(pl_moves) - len(op_moves)
+    return float(pl_future_moves - op_future_moves + len(pl_moves) - len(op_moves))
 
     
 
