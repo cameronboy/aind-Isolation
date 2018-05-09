@@ -95,8 +95,8 @@ def custom_score(game, player):
     pl_moves = game.get_legal_moves(player)
     op_moves = game.get_legal_moves(game.get_opponent(player))
 
-    pl_future_moves = float(sum([len(game.__get_moves__(move)) for move in pl_moves ]))
-    op_future_moves = float(sum([len(game.__get_moves__(move)) for move in op_moves ]))
+    pl_future_moves = float(sum([len(game.get_legal_moves(player)) for move in pl_moves ]))
+    op_future_moves = float(sum([len(game.get_legal_moves(game.get_opponent(player))) for move in op_moves ]))
     
     return float(pl_future_moves - op_future_moves + len(pl_moves) - len(op_moves))
 
@@ -156,8 +156,8 @@ def custom_score_2(game, player):
     # So I'm multiplying the inverse of the mean distance to the center by the number
     # of moves we have PLUS the number of future moves from the board states that
     # terminate from the current board
-    pl_future_moves = float(sum([len(game.__get_moves__(move)) for move in pl_options ]))
-    op_future_moves = float(sum([len(game.__get_moves__(move)) for move in op_optins ]))
+    pl_future_moves = float(sum([len(game.get_legal_moves(player)) for move in pl_options ]))
+    op_future_moves = float(sum([len(game.get_legal_moves(game.get_opponent(player))) for move in op_optins ]))
 
     if total_moves > 0 and total_distance_from_ctr > 0:
         return (1. / float(total_distance_from_ctr / total_moves)) * float(pl_future_moves - op_future_moves + pl_moves - op_moves)

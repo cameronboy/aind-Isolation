@@ -216,7 +216,7 @@ class Board(object):
         return player == self._active_player and not self.get_legal_moves(self._active_player)
 
     def utility(self, player):
-        """Returns the utility of the current game state from the perspective\
+        """Returns the utility of the current game state from the perspective
         of the specified player.
 
                     /  +infinity,   "player" wins
@@ -247,7 +247,7 @@ class Board(object):
 
         return 0.
 
-    def __get_moves__(self, loc):
+    def __get_moves(self, loc):
         """Generate the list of possible moves for an L-shaped motion (like a
         knight in chess).
         """
